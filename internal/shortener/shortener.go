@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/itchyny/base58-go"
+	uuid "github.com/nu7hatch/gouuid"
 )
 
 func sha256Of(input string) []byte {
@@ -25,8 +26,12 @@ func base58Encoded(bytes []byte) string {
 	return string(encoded)
 }
 
-func GenerateShortLink(initialLink string, userId string) string {
-	urlHashBytes := sha256Of(initialLink + userId)
+func GenerateShortLink(initialLink string) string {
+	u, err := uuid.NewV4()
+	if err != nil {
+		panic(err)
+	}
+	urlHashBytes := sha256Of(initialLink + u.String())
 	generatedNumber := new(big.Int).SetBytes(urlHashBytes).Uint64()
 	finalString := base58Encoded([]byte(fmt.Sprintf("%d", generatedNumber)))
 	return finalString[:8]
