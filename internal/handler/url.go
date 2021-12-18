@@ -2,8 +2,8 @@ package handler
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
+	"time"
 
 	db "github.com/amirhosein/alviss/internal/DB"
 	"github.com/amirhosein/alviss/internal/shortener"
@@ -14,7 +14,6 @@ import (
 type UrlCreationRequest struct {
 	LongUrl string `json:"long_url" binding:"required"`
 	ExpDate string `json:"exp_date" binding:"required"`
-	UserId  string `json:"user_id" binding:"required"`
 }
 
 func CreateShortUrl(c echo.Context, port string) error {
@@ -28,13 +27,15 @@ func CreateShortUrl(c echo.Context, port string) error {
 	} else {
 		urlCreationRequest.LongUrl = json_map["long_url"].(string)
 		urlCreationRequest.ExpDate = json_map["exp_date"].(string)
-		urlCreationRequest.UserId = json_map["user_id"].(string)
 	}
-	log.Println("expDate: ", urlCreationRequest.ExpDate)
-	log.Println("longUrl: ", util.GetExpireTime(urlCreationRequest.ExpDate))
+	urlMapping := db.UrlMapping{
+		Original_url: urlCreationRequest.LongUrl,
+		Count:        0,
+		ExpTime:      time.Now().Add(util.GetExpireTime(urlCreationRequest.ExpDate)),
+	}
 
-	shortUrl := shortener.GenerateShortLink(urlCreationRequest.LongUrl, urlCreationRequest.UserId)
-	error := db.SaveUrlMapping(shortUrl, urlCreationRequest.LongUrl, urlCreationRequest.UserId, util.GetExpireTime(urlCreationRequest.ExpDate))
+	shortUrl := shortener.GenerateShortLink(urlCreationRequest.LongUrl)
+	error := db.SaveUrlMapping(shortUrl, urlMapping, util.GetExpireTime(urlCreationRequest.ExpDate))
 
 	if error != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
