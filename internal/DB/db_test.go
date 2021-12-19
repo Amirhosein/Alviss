@@ -28,7 +28,8 @@ func TestInsertionAndRetrieval(t *testing.T) {
 	shortURL := shortener.GenerateShortLink(urlMapping.Original_url)
 
 	// Persist data mapping
-	SaveUrlMapping(shortURL, *urlMapping, expireTime)
+	err := SaveUrlMapping(shortURL, *urlMapping, expireTime)
+	assert.Nil(t, err)
 
 	// Retrieve initial URL
 	retrievedUrl := RetrieveInitialUrl(shortURL)

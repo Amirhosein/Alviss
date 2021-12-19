@@ -45,7 +45,7 @@ func RetrieveInitialUrl(shortUrl string) string {
 		panic(err)
 	}
 	urlMapping := &UrlMapping{}
-	urlMapping.UnmarshalBinary([]byte(result))
+	err = urlMapping.UnmarshalBinary([]byte(result))
 	if err != nil {
 		panic(fmt.Sprintf("Failed RetrieveInitialUrl url | Error: %v - shortUrl: %s\n", err, shortUrl))
 	}
@@ -60,7 +60,7 @@ func RetrieveUrlMapping(shortUrl string) *UrlMapping {
 		panic(err)
 	}
 	urlMapping := &UrlMapping{}
-	urlMapping.UnmarshalBinary([]byte(result))
+	err = urlMapping.UnmarshalBinary([]byte(result))
 	if err != nil {
 		panic(fmt.Sprintf("Failed RetrieveUrlMapping url | Error: %v - shortUrl: %s\n", err, shortUrl))
 	}
