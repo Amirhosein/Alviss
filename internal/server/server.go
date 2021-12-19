@@ -10,7 +10,6 @@ import (
 )
 
 var (
-	// ServerPort is the port on which the server is running
 	ServerPort string
 )
 
@@ -31,6 +30,10 @@ func RunServer(port string) {
 	})
 
 	e.GET("/:shortUrl", func(c echo.Context) error {
+		return handler.HandleShortUrlRedirect(c)
+	})
+
+	e.GET("/url/:shortUrl", func(c echo.Context) error {
 		return handler.HandleShortUrlRedirect(c)
 	})
 

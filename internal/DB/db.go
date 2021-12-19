@@ -53,3 +53,16 @@ func RetrieveInitialUrl(shortUrl string) string {
 	dbService.redisClient.Set(shortUrl, urlMapping, 0)
 	return urlMapping.Original_url
 }
+
+func RetrieveUrlMapping(shortUrl string) *UrlMapping {
+	result, err := dbService.redisClient.Get(shortUrl).Result()
+	if err != nil {
+		panic(err)
+	}
+	urlMapping := &UrlMapping{}
+	urlMapping.UnmarshalBinary([]byte(result))
+	if err != nil {
+		panic(fmt.Sprintf("Failed RetrieveUrlMapping url | Error: %v - shortUrl: %s\n", err, shortUrl))
+	}
+	return urlMapping
+}
