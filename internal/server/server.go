@@ -34,7 +34,7 @@ func RunServer(port string) {
 	})
 
 	e.GET("/url/:shortUrl", func(c echo.Context) error {
-		return handler.HandleShortUrlRedirect(c)
+		return handler.HandleShortUrlDetail(c, ServerPort)
 	})
 
 	e.Logger.Fatal(e.Start(":" + port))
