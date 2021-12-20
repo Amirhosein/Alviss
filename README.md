@@ -58,4 +58,3 @@ Send a GET request and get details of your URL, such as `UsedCount` or `ExpDate`
 ```
 
 
-
