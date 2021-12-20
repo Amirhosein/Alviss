@@ -19,6 +19,10 @@ func GetExpireTime(expDate string) time.Duration {
 		expDate = expDate[:len(expDate)-1]
 		expDateInt, _ := strconv.Atoi(expDate)
 		return time.Second * time.Duration(expDateInt)
+	} else if expDate[len(expDate)-1] == 'm' {
+		expDate = expDate[:len(expDate)-1]
+		expDateInt, _ := strconv.Atoi(expDate)
+		return time.Minute * time.Duration(expDateInt)
 	} else {
 		return 0
 	}
