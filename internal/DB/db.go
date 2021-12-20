@@ -59,7 +59,7 @@ func RetrieveInitialUrl(shortUrl string) string {
 	}
 	urlMapping.Count++
 	dbService.redisClient.Set(shortUrl, urlMapping, 0)
-	return urlMapping.Original_url
+	return urlMapping.OriginalUrl
 }
 
 func RetrieveUrlMapping(shortUrl string) *UrlMapping {

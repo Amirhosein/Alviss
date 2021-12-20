@@ -35,9 +35,9 @@ func CreateShortUrl(c echo.Context, port string) error {
 		urlCreationRequest.ExpDate = json_map["exp_date"].(string)
 	}
 	urlMapping := db.UrlMapping{
-		Original_url: urlCreationRequest.LongUrl,
-		Count:        0,
-		ExpTime:      time.Now().Add(util.GetExpireTime(urlCreationRequest.ExpDate)),
+		OriginalUrl: urlCreationRequest.LongUrl,
+		Count:       0,
+		ExpTime:     time.Now().Add(util.GetExpireTime(urlCreationRequest.ExpDate)),
 	}
 
 	shortUrl := shortener.GenerateShortLink(urlCreationRequest.LongUrl)
@@ -73,7 +73,7 @@ func HandleShortUrlDetail(c echo.Context, port string) error {
 		})
 	} else {
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"OriginalUrl": result.Original_url,
+			"OriginalUrl": result.OriginalUrl,
 			"ShortUrl":    "http://localhost:" + port + "/" + shortUrl,
 			"UsedCount":   result.Count,
 			"ExpDate":     result.ExpTime,

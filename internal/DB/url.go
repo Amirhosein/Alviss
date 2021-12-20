@@ -6,9 +6,9 @@ import (
 )
 
 type UrlMapping struct {
-	Original_url string    `json:"original_url"`
-	Count        int       `json:"count"`
-	ExpTime      time.Time `json:"exp_time"`
+	OriginalUrl string    `json:"OriginalUrl"`
+	Count       int       `json:"count"`
+	ExpTime     time.Time `json:"ExpTime"`
 }
 
 func (s UrlMapping) MarshalBinary() ([]byte, error) {
