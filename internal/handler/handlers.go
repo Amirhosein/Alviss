@@ -16,6 +16,12 @@ type UrlCreationRequest struct {
 	ExpDate string `json:"exp_date" binding:"required"`
 }
 
+func Home(c echo.Context) error {
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "Welcome to Alviss! Your mythical URL shortener",
+	})
+}
+
 func CreateShortUrl(c echo.Context, port string) error {
 	urlCreationRequest := new(UrlCreationRequest)
 	json_map := make(map[string]interface{})

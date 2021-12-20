@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"net/http"
 
 	db "github.com/amirhosein/alviss/internal/DB"
 	"github.com/amirhosein/alviss/internal/handler"
@@ -20,9 +19,7 @@ func RunServer(port string) {
 
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"message": "Welcome to Alviss! Your mythical URL shortener",
-		})
+		return handler.Home(c)
 	})
 
 	e.POST("/shorten", func(c echo.Context) error {
