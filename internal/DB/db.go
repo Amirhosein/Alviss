@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -16,8 +17,15 @@ var (
 )
 
 func InitializeStore() *DBService {
+	host := "redis"
+	_, ok := os.LookupEnv("REDIS_HOST")
+	if !ok {
+		host = "localhost"
+	}
+
+	time.Sleep(time.Second * 1)
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:     "redis:6379",
+		Addr:     host + ":6379",
 		Password: "",
 		DB:       0,
 	})
