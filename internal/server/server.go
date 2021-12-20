@@ -21,7 +21,7 @@ func RunServer(port string) {
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"message": "Welcome to Alviss, your mythical URL shortener",
+			"message": "Welcome to Alviss! Your mythical URL shortener",
 		})
 	})
 
