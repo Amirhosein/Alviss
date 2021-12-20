@@ -32,8 +32,8 @@ Send a GET request and get a warm welcome :)
 POST a JSON object like below and in return, get the generated short link:
 ```JSON
 {
-  "LongUrl": "https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716"
-  "ExpDate": "2d"
+  "LongUrl": "https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716",
+  "ExpTime": "2d"
 }
 ```
 Exp date valid format: `2d` for 2 days, `2h` for 2 hours, `2m` for 2 minutes and `2s` for 2 seconds.

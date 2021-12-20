@@ -12,8 +12,8 @@ import (
 )
 
 type UrlCreationRequest struct {
-	LongUrl string `json:"long_url" binding:"required"`
-	ExpDate string `json:"exp_date" binding:"required"`
+	LongUrl string `json:"LongUrl" binding:"required"`
+	ExpDate string `json:"ExpTime" binding:"required"`
 }
 
 func Home(c echo.Context) error {
@@ -31,13 +31,13 @@ func CreateShortUrl(c echo.Context, port string) error {
 			"message": "Invalid request body",
 		})
 	} else {
-		urlCreationRequest.LongUrl = json_map["long_url"].(string)
-		urlCreationRequest.ExpDate = json_map["exp_date"].(string)
+		urlCreationRequest.LongUrl = json_map["LongUrl"].(string)
+		urlCreationRequest.ExpDate = json_map["ExpTime"].(string)
 	}
 	urlMapping := db.UrlMapping{
-		OriginalUrl: urlCreationRequest.LongUrl,
-		Count:       0,
-		ExpTime:     time.Now().Add(util.GetExpireTime(urlCreationRequest.ExpDate)),
+		Original_url: urlCreationRequest.LongUrl,
+		Count:        0,
+		ExpTime:      time.Now().Add(util.GetExpireTime(urlCreationRequest.ExpDate)),
 	}
 
 	shortUrl := shortener.GenerateShortLink(urlCreationRequest.LongUrl)
@@ -50,8 +50,8 @@ func CreateShortUrl(c echo.Context, port string) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message":   "short url created successfully",
-		"short_url": "http://localhost:" + port + "/" + shortUrl,
+		"message":  "short url created successfully",
+		"ShortUrl": "http://localhost:" + port + "/" + shortUrl,
 	})
 }
 
@@ -73,7 +73,7 @@ func HandleShortUrlDetail(c echo.Context, port string) error {
 		})
 	} else {
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"OriginalUrl": result.OriginalUrl,
+			"OriginalUrl": result.Original_url,
 			"ShortUrl":    "http://localhost:" + port + "/" + shortUrl,
 			"UsedCount":   result.Count,
 			"ExpDate":     result.ExpTime,

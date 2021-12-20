@@ -22,10 +22,10 @@ func TestStoreInit(t *testing.T) {
 func TestInsertionAndRetrieval(t *testing.T) {
 	urlMapping := new(UrlMapping)
 
-	urlMapping.OriginalUrl = "https://www.guru3d.com/news-story/spotted-ryzen-threadripper-pro-3995wx-processor-with-8-channel-ddr4,2.html"
+	urlMapping.Original_url = "https://www.guru3d.com/news-story/spotted-ryzen-threadripper-pro-3995wx-processor-with-8-channel-ddr4,2.html"
 	expireTime := util.GetExpireTime("2d")
 	urlMapping.ExpTime = time.Now().Add(expireTime)
-	shortURL := shortener.GenerateShortLink(urlMapping.OriginalUrl)
+	shortURL := shortener.GenerateShortLink(urlMapping.Original_url)
 
 	// Persist data mapping
 	err := SaveUrlMapping(shortURL, *urlMapping, expireTime)
@@ -34,5 +34,5 @@ func TestInsertionAndRetrieval(t *testing.T) {
 	// Retrieve initial URL
 	retrievedUrl := RetrieveInitialUrl(shortURL)
 
-	assert.Equal(t, urlMapping.OriginalUrl, retrievedUrl)
+	assert.Equal(t, urlMapping.Original_url, retrievedUrl)
 }
