@@ -6,7 +6,6 @@ import (
 	"time"
 
 	db "github.com/amirhosein/alviss/internal/app/alviss/DB"
-	"github.com/amirhosein/alviss/internal/app/alviss/shortener"
 	"github.com/amirhosein/alviss/internal/app/alviss/util"
 	"github.com/labstack/echo/v4"
 )
@@ -40,7 +39,7 @@ func CreateShortUrl(c echo.Context, port string) error {
 		ExpTime:      time.Now().Add(util.GetExpireTime(urlCreationRequest.ExpDate)),
 	}
 
-	shortUrl := shortener.GenerateShortLink(urlCreationRequest.LongUrl)
+	shortUrl := util.GenerateShortLink(urlCreationRequest.LongUrl)
 	error := db.SaveUrlMapping(shortUrl, urlMapping, util.GetExpireTime(urlCreationRequest.ExpDate))
 
 	if error != nil {
