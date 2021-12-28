@@ -18,7 +18,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/amirhosein/alviss/internal/server"
+	"github.com/amirhosein/alviss/internal/app/alviss/server"
 	"github.com/spf13/cobra"
 )
 

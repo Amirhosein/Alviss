@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/amirhosein/alviss/internal/shortener"
-	"github.com/amirhosein/alviss/internal/util"
+	"github.com/amirhosein/alviss/internal/app/alviss/shortener"
+	"github.com/amirhosein/alviss/internal/app/alviss/util"
 	"github.com/stretchr/testify/assert"
 )
 

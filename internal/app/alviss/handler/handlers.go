@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	db "github.com/amirhosein/alviss/internal/DB"
-	"github.com/amirhosein/alviss/internal/shortener"
-	"github.com/amirhosein/alviss/internal/util"
+	db "github.com/amirhosein/alviss/internal/app/alviss/DB"
+	"github.com/amirhosein/alviss/internal/app/alviss/shortener"
+	"github.com/amirhosein/alviss/internal/app/alviss/util"
 	"github.com/labstack/echo/v4"
 )
 

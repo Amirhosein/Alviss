@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/amirhosein/alviss/internal/cmd"
+import "github.com/amirhosein/alviss/internal/app/alviss/cmd"
 
 func main() {
 	cmd.Execute()

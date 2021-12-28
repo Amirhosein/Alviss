@@ -3,8 +3,8 @@ package server
 import (
 	"fmt"
 
-	db "github.com/amirhosein/alviss/internal/DB"
-	"github.com/amirhosein/alviss/internal/handler"
+	db "github.com/amirhosein/alviss/internal/app/alviss/DB"
+	"github.com/amirhosein/alviss/internal/app/alviss/handler"
 	"github.com/labstack/echo/v4"
 )
 
