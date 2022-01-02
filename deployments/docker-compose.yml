@@ -7,6 +7,21 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - REDIS_HOST="redis"
+      - REDIS_HOST=redis
   redis:
     image: redis
+  
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=alviss
+    volumes:
+      - ../db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    depends_on:
+      - web
+    networks:
+      - default
