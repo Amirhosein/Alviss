@@ -2,10 +2,11 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
-	db "github.com/amirhosein/alviss/internal/app/alviss/DB"
+	"github.com/amirhosein/alviss/internal/app/alviss/model"
 	"github.com/amirhosein/alviss/internal/app/alviss/util"
 	"github.com/labstack/echo/v4"
 )
@@ -21,7 +22,7 @@ func Home(c echo.Context) error {
 	})
 }
 
-func CreateShortUrl(c echo.Context, port string) error {
+func CreateShortUrl(c echo.Context, port string, sqlUrlRepo model.SQLUrlRepo) error {
 	urlCreationRequest := new(UrlCreationRequest)
 	json_map := make(map[string]interface{})
 	err := json.NewDecoder(c.Request().Body).Decode(&json_map)
@@ -33,14 +34,14 @@ func CreateShortUrl(c echo.Context, port string) error {
 		urlCreationRequest.LongUrl = json_map["LongUrl"].(string)
 		urlCreationRequest.ExpDate = json_map["ExpTime"].(string)
 	}
-	urlMapping := db.UrlMapping{
+	urlMapping := model.UrlMapping{
 		Original_url: urlCreationRequest.LongUrl,
 		Count:        0,
 		ExpTime:      time.Now().Add(util.GetExpireTime(urlCreationRequest.ExpDate)),
 	}
 
 	shortUrl := util.GenerateShortLink(urlCreationRequest.LongUrl)
-	error := db.SaveUrlMapping(shortUrl, urlMapping, util.GetExpireTime(urlCreationRequest.ExpDate))
+	error := sqlUrlRepo.SaveUrlMapping(shortUrl, urlMapping, util.GetExpireTime(urlCreationRequest.ExpDate))
 
 	if error != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -54,21 +55,39 @@ func CreateShortUrl(c echo.Context, port string) error {
 	})
 }
 
-func HandleShortUrlRedirect(c echo.Context) error {
-
+func HandleShortUrlRedirect(c echo.Context, sqlUrlRepo model.SQLUrlRepo) error {
 	shortUrl := c.Param("shortUrl")
-	initialUrl := db.RetrieveInitialUrl(shortUrl)
-	return c.Redirect(http.StatusFound, initialUrl)
-
+	result, err := sqlUrlRepo.GetUrlMapping(shortUrl)
+	if err != nil {
+		log.Println(err)
+	}
+	if (model.UrlMapping{}) == result {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"message": "Short url not found",
+		})
+	}
+	if !result.ExpTime.IsZero() && result.ExpTime.Before(time.Now()) {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"message": "Short url expired",
+		})
+	}
+	result.Count++
+	sqlUrlRepo.UpdateUrlMapping(shortUrl, result)
+	return c.Redirect(http.StatusMovedPermanently, result.Original_url)
 }
 
-func HandleShortUrlDetail(c echo.Context, port string) error {
+func HandleShortUrlDetail(c echo.Context, port string, sqlUrlRepo model.SQLUrlRepo) error {
 
 	shortUrl := c.Param("shortUrl")
-	result := db.RetrieveUrlMapping(shortUrl)
-	if result == nil {
+	result, err := sqlUrlRepo.GetUrlMapping(shortUrl)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+	if (model.UrlMapping{}) == result {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
-			"message": "short url not found",
+			"message": "Short url not found",
 		})
 	} else {
 		return c.JSON(http.StatusOK, map[string]interface{}{
