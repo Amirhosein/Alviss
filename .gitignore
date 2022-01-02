@@ -12,3 +12,4 @@
 *.out
 dump.rdb
 .DS_Store
+db/
