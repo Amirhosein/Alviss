@@ -1,76 +1,56 @@
 package db
 
 import (
+	"database/sql"
 	"fmt"
-	"os"
-	"time"
+	"log"
 
-	"github.com/go-redis/redis"
+	_ "github.com/lib/pq"
 )
 
-type DBService struct {
-	redisClient *redis.Client
-}
-
-var (
-	dbService = &DBService{}
+// initialize the database using postgres
+const (
+	DB_HOST     = "db"
+	DB_PORT     = "5432"
+	DB_USER     = "postgres"
+	DB_PASSWORD = "postgres"
+	DB_NAME     = "alviss"
 )
 
-func InitializeStore() *DBService {
-	host := "redis"
-	_, ok := os.LookupEnv("REDIS_HOST")
-	if !ok {
-		host = "localhost"
-	}
+func InitDB() *sql.DB {
+	psqlInfo := fmt.Sprintf("user=%s "+
+		"password=%s host=%s port=%s sslmode=disable",
+		DB_USER, DB_PASSWORD, DB_HOST, DB_PORT)
 
-	time.Sleep(time.Second * 1)
-	redisClient := redis.NewClient(&redis.Options{
-		Addr:     host + ":6379",
-		Password: "",
-		DB:       0,
-	})
-
-	pong, err := redisClient.Ping().Result()
-	if err != nil {
-		panic(fmt.Sprintf("Error init Redis: %v", err))
-	}
-
-	fmt.Printf("\nRedis started successfully: pong message = {%s}", pong)
-	dbService.redisClient = redisClient
-	return dbService
-}
-
-func SaveUrlMapping(shortUrl string, urlMapping UrlMapping, ExpireTime time.Duration) error {
-	if dbService.redisClient == nil {
-		return fmt.Errorf("redis client is not initialized")
-	}
-	return dbService.redisClient.Set(shortUrl, urlMapping, ExpireTime).Err()
-}
-
-func RetrieveInitialUrl(shortUrl string) string {
-	result, err := dbService.redisClient.Get(shortUrl).Result()
+	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
 	}
-	urlMapping := &UrlMapping{}
-	err = urlMapping.UnmarshalBinary([]byte(result))
-	if err != nil {
-		panic(fmt.Sprintf("Failed RetrieveInitialUrl url | Error: %v - shortUrl: %s\n", err, shortUrl))
-	}
-	urlMapping.Count++
-	dbService.redisClient.Set(shortUrl, urlMapping, 0)
-	return urlMapping.Original_url
-}
 
-func RetrieveUrlMapping(shortUrl string) *UrlMapping {
-	result, err := dbService.redisClient.Get(shortUrl).Result()
+	err = db.Ping()
 	if err != nil {
-		panic(err)
+		_, err = db.Exec("create database " + DB_NAME)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
-	urlMapping := &UrlMapping{}
-	err = urlMapping.UnmarshalBinary([]byte(result))
+
+	// check if the table exists
+	var tableExists bool
+	err = db.QueryRow("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'url_mapping')").Scan(&tableExists)
 	if err != nil {
-		panic(fmt.Sprintf("Failed RetrieveUrlMapping url | Error: %v - shortUrl: %s\n", err, shortUrl))
+		log.Fatal(err)
 	}
-	return urlMapping
+
+	if !tableExists {
+		_, err = db.Exec("CREATE TABLE url_mapping (short_url VARCHAR(255) PRIMARY KEY, original_url VARCHAR(255), count INT, exp_time TIMESTAMP)")
+	}
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Successfully connected to the database")
+
+	return db
 }
