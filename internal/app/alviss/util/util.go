@@ -13,7 +13,6 @@ import (
 )
 
 func GetExpireTime(expDate string) time.Duration {
-
 	if expDate[len(expDate)-1] == 'h' {
 		expDate = expDate[:len(expDate)-1]
 		expDateInt, _ := strconv.Atoi(expDate)
