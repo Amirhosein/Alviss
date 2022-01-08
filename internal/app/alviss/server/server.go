@@ -20,7 +20,7 @@ func RunServer(port string) {
 	// sleep for a while to wait for the database to be ready
 	time.Sleep(time.Second * 3)
 
-	sqlUrlRepo := model.SQLUrlRepo{DB: db.InitDB()}
+	sqlURLRepo := model.SQLURLRepo{DB: db.InitDB()}
 
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
@@ -28,15 +28,15 @@ func RunServer(port string) {
 	})
 
 	e.POST("/shorten", func(c echo.Context) error {
-		return handler.CreateShortUrl(c, ServerPort, sqlUrlRepo)
+		return handler.CreateShortURL(c, ServerPort, sqlURLRepo)
 	})
 
-	e.GET("/:shortUrl", func(c echo.Context) error {
-		return handler.HandleShortUrlRedirect(c, sqlUrlRepo)
+	e.GET("/:shortURL", func(c echo.Context) error {
+		return handler.HandleShortURLRedirect(c, sqlURLRepo)
 	})
 
-	e.GET("/url/:shortUrl", func(c echo.Context) error {
-		return handler.HandleShortUrlDetail(c, ServerPort, sqlUrlRepo)
+	e.GET("/url/:shortURL", func(c echo.Context) error {
+		return handler.HandleShortURLDetail(c, ServerPort, sqlURLRepo)
 	})
 
 	e.Logger.Fatal(e.Start(":" + port))

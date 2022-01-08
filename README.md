@@ -32,7 +32,7 @@ Send a GET request and get a warm welcome :)
 POST a JSON object like below and in return, get the generated short link:
 ```JSON
 {
-  "LongUrl": "https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716",
+  "LongURL": "https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716",
   "ExpTime": "2d"
 }
 ```
@@ -42,7 +42,7 @@ Exp date valid format: `2d` for 2 days, `2h` for 2 hours, `2m` for 2 minutes and
 ```JSON
 {
   "message": "short url created successfully",
-  "ShortUrl": "http://localhost:8080/ZLgJHJB2"
+  "ShortURL": "http://localhost:8080/ZLgJHJB2"
 }
 ```
 
@@ -51,8 +51,8 @@ Send a GET request and get details of your URL, such as `UsedCount` or `ExpDate`
 ```JSON
 {
   "ExpDate": "2021-12-20T15:38:26.48860767Z",
-  "OriginalUrl": "https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716",
-  "ShortUrl": "http://localhost:8080/ZLgJHJB2",
+  "OriginalURL": "https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716",
+  "ShortURL": "http://localhost:8080/ZLgJHJB2",
   "UsedCount": 3
 }
 ```

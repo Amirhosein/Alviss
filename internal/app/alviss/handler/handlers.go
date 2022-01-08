@@ -11,8 +11,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type UrlCreationRequest struct {
-	LongUrl string `json:"LongUrl" binding:"required"`
+type URLCreationRequest struct {
+	LongURL string `json:"LongURL" binding:"required"`
 	ExpDate string `json:"ExpTime" binding:"required"`
 }
 
@@ -22,8 +22,8 @@ func Home(c echo.Context) error {
 	})
 }
 
-func CreateShortUrl(c echo.Context, port string, sqlUrlRepo model.SQLUrlRepo) error {
-	urlCreationRequest := new(UrlCreationRequest)
+func CreateShortURL(c echo.Context, port string, sqlURLRepo model.SQLURLRepo) error {
+	urlCreationRequest := new(URLCreationRequest)
 	json_map := make(map[string]interface{})
 	err := json.NewDecoder(c.Request().Body).Decode(&json_map)
 	if err != nil {
@@ -31,17 +31,17 @@ func CreateShortUrl(c echo.Context, port string, sqlUrlRepo model.SQLUrlRepo) er
 			"message": "Invalid request body",
 		})
 	} else {
-		urlCreationRequest.LongUrl = json_map["LongUrl"].(string)
+		urlCreationRequest.LongURL = json_map["LongURL"].(string)
 		urlCreationRequest.ExpDate = json_map["ExpTime"].(string)
 	}
-	urlMapping := model.UrlMapping{
-		Original_url: urlCreationRequest.LongUrl,
+	urlMapping := model.URLMapping{
+		Original_url: urlCreationRequest.LongURL,
 		Count:        0,
 		ExpTime:      time.Now().Add(util.GetExpireTime(urlCreationRequest.ExpDate)),
 	}
 
-	shortUrl := util.GenerateShortLink(urlCreationRequest.LongUrl)
-	error := sqlUrlRepo.SaveUrlMapping(shortUrl, urlMapping, util.GetExpireTime(urlCreationRequest.ExpDate))
+	shortURL := util.GenerateShortLink(urlCreationRequest.LongURL)
+	error := sqlURLRepo.SaveURLMapping(shortURL, urlMapping, util.GetExpireTime(urlCreationRequest.ExpDate))
 
 	if error != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -51,17 +51,17 @@ func CreateShortUrl(c echo.Context, port string, sqlUrlRepo model.SQLUrlRepo) er
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message":  "short url created successfully",
-		"ShortUrl": "http://localhost:" + port + "/" + shortUrl,
+		"ShortURL": "http://localhost:" + port + "/" + shortURL,
 	})
 }
 
-func HandleShortUrlRedirect(c echo.Context, sqlUrlRepo model.SQLUrlRepo) error {
-	shortUrl := c.Param("shortUrl")
-	result, err := sqlUrlRepo.GetUrlMapping(shortUrl)
+func HandleShortURLRedirect(c echo.Context, sqlURLRepo model.SQLURLRepo) error {
+	shortURL := c.Param("shortURL")
+	result, err := sqlURLRepo.GetURLMapping(shortURL)
 	if err != nil {
 		log.Println(err)
 	}
-	if (model.UrlMapping{}) == result {
+	if (model.URLMapping{}) == result {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"message": "Short url not found",
 		})
@@ -72,30 +72,28 @@ func HandleShortUrlRedirect(c echo.Context, sqlUrlRepo model.SQLUrlRepo) error {
 		})
 	}
 	result.Count++
-	sqlUrlRepo.UpdateUrlMapping(shortUrl, result)
+	sqlURLRepo.UpdateURLMapping(shortURL, result)
 	return c.Redirect(http.StatusMovedPermanently, result.Original_url)
 }
 
-func HandleShortUrlDetail(c echo.Context, port string, sqlUrlRepo model.SQLUrlRepo) error {
-
-	shortUrl := c.Param("shortUrl")
-	result, err := sqlUrlRepo.GetUrlMapping(shortUrl)
+func HandleShortURLDetail(c echo.Context, port string, sqlURLRepo model.SQLURLRepo) error {
+	shortURL := c.Param("shortURL")
+	result, err := sqlURLRepo.GetURLMapping(shortURL)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": err.Error(),
 		})
 	}
-	if (model.UrlMapping{}) == result {
+	if (model.URLMapping{}) == result {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"message": "Short url not found",
 		})
 	} else {
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"OriginalUrl": result.Original_url,
-			"ShortUrl":    "http://localhost:" + port + "/" + shortUrl,
+			"OriginalURL": result.Original_url,
+			"ShortURL":    "http://localhost:" + port + "/" + shortURL,
 			"UsedCount":   result.Count,
 			"ExpDate":     result.ExpTime,
 		})
 	}
-
 }
