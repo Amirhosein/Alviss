@@ -15,28 +15,31 @@ var (
 )
 
 func RunServer(port string) {
-	ServerPort = port
 	fmt.Println("Server is running on port " + port)
 	// sleep for a while to wait for the database to be ready
 	time.Sleep(time.Second * 3)
 
 	sqlURLRepo := model.SQLURLRepo{DB: db.InitDB()}
+	h := handler.Handler{
+		Port:       port,
+		SQLURLRepo: sqlURLRepo,
+	}
 
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
-		return handler.Home(c)
+		return h.Home(c)
 	})
 
 	e.POST("/shorten", func(c echo.Context) error {
-		return handler.CreateShortURL(c, ServerPort, sqlURLRepo)
+		return h.CreateShortURL(c)
 	})
 
 	e.GET("/:shortURL", func(c echo.Context) error {
-		return handler.HandleShortURLRedirect(c, sqlURLRepo)
+		return h.HandleShortURLRedirect(c)
 	})
 
 	e.GET("/url/:shortURL", func(c echo.Context) error {
-		return handler.HandleShortURLDetail(c, ServerPort, sqlURLRepo)
+		return h.HandleShortURLDetail(c)
 	})
 
 	e.Logger.Fatal(e.Start(":" + port))
