@@ -51,7 +51,7 @@ func (s SQLURLRepo) GetURLMapping(shortURL string) (URLMapping, error) {
 	return urlMapping, err
 }
 
-func (s SQLURLRepo) UpdateURLMapping(shortURL string, urlMapping URLMapping) error {
+func (s SQLURLRepo) Update(shortURL string, urlMapping URLMapping) error {
 	log.Println(urlMapping)
 	_, err := s.DB.Exec("UPDATE url_mapping SET count=$1, exp_time=$2 WHERE short_url=$3", urlMapping.Count, urlMapping.ExpTime, shortURL)
 	return err
