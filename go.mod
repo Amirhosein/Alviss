@@ -3,6 +3,8 @@ module github.com/amirhosein/alviss
 go 1.17
 
 require (
+	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
+	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/itchyny/base58-go v0.2.0
 	github.com/labstack/echo/v4 v4.6.1
 	github.com/lib/pq v1.10.4
@@ -12,6 +14,7 @@ require (
 )
 
 require (
+	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
