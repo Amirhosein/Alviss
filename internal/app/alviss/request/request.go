@@ -7,6 +7,8 @@ import (
 
 	"github.com/amirhosein/alviss/internal/app/alviss/model"
 	"github.com/amirhosein/alviss/internal/app/alviss/util"
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/labstack/echo/v4"
 )
 
@@ -33,6 +35,13 @@ func ShortURLCreationRequest(c echo.Context, SQLURLRepo model.SQLURLRepo, port s
 		ExpTime:      time.Now().Add(util.GetExpireTime(urlCreationRequest.ExpDate)),
 	}
 
+	err = validate(c, urlMapping)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": err.Error(),
+		})
+	}
+
 	shortURL := util.GenerateShortLink(urlCreationRequest.LongURL)
 	error := SQLURLRepo.SaveURLMapping(shortURL, urlMapping, util.GetExpireTime(urlCreationRequest.ExpDate))
 
@@ -46,4 +55,15 @@ func ShortURLCreationRequest(c echo.Context, SQLURLRepo model.SQLURLRepo, port s
 		"message":  "short url created successfully",
 		"ShortURL": "http://localhost:" + port + "/" + shortURL,
 	})
+}
+
+func validate(c echo.Context, urlMapping model.URLMapping) error {
+	err := validation.ValidateStruct(&urlMapping,
+		validation.Field(&urlMapping.Original_url, validation.Required, is.URL),
+		validation.Field(&urlMapping.ExpTime, validation.Required),
+	)
+	if err != nil {
+		return err
+	}
+	return nil
 }
