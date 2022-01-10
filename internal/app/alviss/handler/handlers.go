@@ -47,7 +47,10 @@ func (h Handler) HandleShortURLRedirect(c echo.Context) error {
 		})
 	}
 	result.Count++
-	h.SQLURLRepo.UpdateURLMapping(shortURL, result)
+	err = h.SQLURLRepo.Update(shortURL, result)
+	if err != nil {
+		log.Println(err)
+	}
 	return c.Redirect(http.StatusMovedPermanently, result.Original_url)
 }
 
