@@ -21,8 +21,8 @@ func RunServer(port string) {
 
 	sqlURLRepo := model.SQLURLRepo{DB: db.InitDB()}
 	h := handler.Handler{
-		Port:       port,
-		SQLURLRepo: sqlURLRepo,
+		Port:    port,
+		URLRepo: sqlURLRepo,
 	}
 
 	e := echo.New()
