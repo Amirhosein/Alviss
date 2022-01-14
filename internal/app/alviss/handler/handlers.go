@@ -7,6 +7,7 @@ import (
 
 	"github.com/amirhosein/alviss/internal/app/alviss/model"
 	"github.com/amirhosein/alviss/internal/app/alviss/request"
+	"github.com/amirhosein/alviss/internal/app/alviss/response"
 	"github.com/amirhosein/alviss/internal/app/alviss/util"
 
 	"github.com/labstack/echo/v4"
@@ -18,24 +19,18 @@ type Handler struct {
 }
 
 func (h Handler) Home(c echo.Context) error {
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "Welcome to Alviss! Your mythical URL shortener",
-	})
+	return response.Welcome(c)
 }
 
 func (h Handler) CreateShortURL(c echo.Context) error {
 	urlCreationRequest := new(request.URLCreationRequest)
 
 	if err := c.Bind(urlCreationRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "Invalid request body",
-		})
+		return response.InvalidRequest(c)
 	}
 
 	if err := urlCreationRequest.Validate(); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": err.Error(),
-		})
+		return response.Error(c, err)
 	}
 
 	urlMapping := model.URLMapping{
@@ -48,15 +43,10 @@ func (h Handler) CreateShortURL(c echo.Context) error {
 
 	err := h.URLRepo.Save(shortURL, urlMapping, util.GetExpireTime(urlCreationRequest.ExpDate))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": err.Error(),
-		})
+		return response.Error(c, err)
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message":  "short url created successfully",
-		"ShortURL": "http://localhost:" + h.Port + "/" + shortURL,
-	})
+	return response.SuccessfullyCreated(c, h.Port, shortURL)
 }
 
 func (h Handler) HandleShortURLRedirect(c echo.Context) error {
@@ -66,14 +56,10 @@ func (h Handler) HandleShortURLRedirect(c echo.Context) error {
 		log.Println(err)
 	}
 	if (model.URLMapping{}) == result {
-		return c.JSON(http.StatusNotFound, map[string]interface{}{
-			"message": "Short url not found",
-		})
+		return response.NotFound(c)
 	}
 	if !result.ExpTime.IsZero() && result.ExpTime.Before(time.Now()) {
-		return c.JSON(http.StatusNotFound, map[string]interface{}{
-			"message": "Short url expired",
-		})
+		return response.Expired(c)
 	}
 	result.Count++
 	err = h.URLRepo.Update(shortURL, result)
@@ -87,20 +73,11 @@ func (h Handler) HandleShortURLDetail(c echo.Context) error {
 	shortURL := c.Param("shortURL")
 	result, err := h.URLRepo.Get(shortURL)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": err.Error(),
-		})
+		return response.Error(c, err)
 	}
 	if (model.URLMapping{}) == result {
-		return c.JSON(http.StatusNotFound, map[string]interface{}{
-			"message": "Short url not found",
-		})
+		return response.NotFound(c)
 	} else {
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"OriginalURL": result.OriginalURL,
-			"ShortURL":    "http://localhost:" + h.Port + "/" + shortURL,
-			"UsedCount":   result.Count,
-			"ExpDate":     result.ExpTime,
-		})
+		return response.Detail(c, result, shortURL, h.Port)
 	}
 }
