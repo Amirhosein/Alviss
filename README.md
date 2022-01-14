@@ -41,7 +41,7 @@ Exp date valid format: `2d` for 2 days, `2h` for 2 hours, `2m` for 2 minutes and
 #### Result:
 ```JSON
 {
-  "message": "short url created successfully",
+  "message": "Short url created successfully",
   "ShortURL": "http://localhost:8080/ZLgJHJB2"
 }
 ```
