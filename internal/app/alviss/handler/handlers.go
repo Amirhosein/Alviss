@@ -7,6 +7,7 @@ import (
 
 	"github.com/amirhosein/alviss/internal/app/alviss/model"
 	"github.com/amirhosein/alviss/internal/app/alviss/request"
+	"github.com/amirhosein/alviss/internal/app/alviss/response"
 	"github.com/amirhosein/alviss/internal/app/alviss/util"
 
 	"github.com/labstack/echo/v4"
@@ -18,24 +19,27 @@ type Handler struct {
 }
 
 func (h Handler) Home(c echo.Context) error {
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "Welcome to Alviss! Your mythical URL shortener",
-	})
+	message := response.Message{
+		Message: "Welcome to Alviss! Your mythical URL shortener",
+	}
+	return c.JSON(http.StatusInternalServerError, message)
 }
 
 func (h Handler) CreateShortURL(c echo.Context) error {
 	urlCreationRequest := new(request.URLCreationRequest)
 
 	if err := c.Bind(urlCreationRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "Invalid request body",
-		})
+		message := response.Message{
+			Message: "Invalid request body",
+		}
+		return c.JSON(http.StatusInternalServerError, message)
 	}
 
 	if err := urlCreationRequest.Validate(); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": err.Error(),
-		})
+		message := response.Message{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, message)
 	}
 
 	urlMapping := model.URLMapping{
@@ -48,15 +52,17 @@ func (h Handler) CreateShortURL(c echo.Context) error {
 
 	err := h.URLRepo.Save(shortURL, urlMapping, util.GetExpireTime(urlCreationRequest.ExpDate))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": err.Error(),
-		})
+		message := response.Message{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, message)
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message":  "short url created successfully",
-		"ShortURL": "http://localhost:" + h.Port + "/" + shortURL,
-	})
+	successfullyCreated := response.SuccessfullyCreated{
+		Message:  "Short url created successfully",
+		ShortURL: "http://localhost:" + h.Port + "/" + shortURL,
+	}
+	return c.JSON(http.StatusOK, successfullyCreated)
 }
 
 func (h Handler) HandleShortURLRedirect(c echo.Context) error {
@@ -66,14 +72,16 @@ func (h Handler) HandleShortURLRedirect(c echo.Context) error {
 		log.Println(err)
 	}
 	if (model.URLMapping{}) == result {
-		return c.JSON(http.StatusNotFound, map[string]interface{}{
-			"message": "Short url not found",
-		})
+		message := response.Message{
+			Message: "Short url not found",
+		}
+		return c.JSON(http.StatusInternalServerError, message)
 	}
 	if !result.ExpTime.IsZero() && result.ExpTime.Before(time.Now()) {
-		return c.JSON(http.StatusNotFound, map[string]interface{}{
-			"message": "Short url expired",
-		})
+		message := response.Message{
+			Message: "Short url expired",
+		}
+		return c.JSON(http.StatusInternalServerError, message)
 	}
 	result.Count++
 	err = h.URLRepo.Update(shortURL, result)
@@ -87,20 +95,23 @@ func (h Handler) HandleShortURLDetail(c echo.Context) error {
 	shortURL := c.Param("shortURL")
 	result, err := h.URLRepo.Get(shortURL)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": err.Error(),
-		})
+		message := response.Message{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, message)
 	}
 	if (model.URLMapping{}) == result {
-		return c.JSON(http.StatusNotFound, map[string]interface{}{
-			"message": "Short url not found",
-		})
+		message := response.Message{
+			Message: "Short url not found",
+		}
+		return c.JSON(http.StatusInternalServerError, message)
 	} else {
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"OriginalURL": result.OriginalURL,
-			"ShortURL":    "http://localhost:" + h.Port + "/" + shortURL,
-			"UsedCount":   result.Count,
-			"ExpDate":     result.ExpTime,
-		})
+		detail := response.Detail{
+			OriginalURL: result.OriginalURL,
+			ShortURL:    "http://localhost:" + h.Port + "/" + shortURL,
+			UsedCount:   result.Count,
+			ExpDate:     result.ExpTime.Format("2006-01-02 15:04:05"),
+		}
+		return c.JSON(http.StatusInternalServerError, detail)
 	}
 }
