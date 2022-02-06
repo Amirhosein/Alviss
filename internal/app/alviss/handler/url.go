@@ -13,19 +13,19 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type Handler struct {
+type URLHandler struct {
 	Port    string
 	URLRepo model.URLRepo
 }
 
-func (h Handler) Home(c echo.Context) error {
+func (h URLHandler) Home(c echo.Context) error {
 	message := response.Message{
 		Message: "Welcome to Alviss! Your mythical URL shortener",
 	}
 	return c.JSON(http.StatusInternalServerError, message)
 }
 
-func (h Handler) CreateShortURL(c echo.Context) error {
+func (h URLHandler) CreateShortURL(c echo.Context) error {
 	urlCreationRequest := new(request.URLCreationRequest)
 
 	if err := c.Bind(urlCreationRequest); err != nil {
@@ -65,7 +65,7 @@ func (h Handler) CreateShortURL(c echo.Context) error {
 	return c.JSON(http.StatusOK, successfullyCreated)
 }
 
-func (h Handler) HandleShortURLRedirect(c echo.Context) error {
+func (h URLHandler) HandleShortURLRedirect(c echo.Context) error {
 	shortURL := c.Param("shortURL")
 	result, err := h.URLRepo.Get(shortURL)
 	if err != nil {
@@ -91,7 +91,7 @@ func (h Handler) HandleShortURLRedirect(c echo.Context) error {
 	return c.Redirect(http.StatusMovedPermanently, result.OriginalURL)
 }
 
-func (h Handler) HandleShortURLDetail(c echo.Context) error {
+func (h URLHandler) HandleShortURLDetail(c echo.Context) error {
 	shortURL := c.Param("shortURL")
 	result, err := h.URLRepo.Get(shortURL)
 	if err != nil {
@@ -100,11 +100,12 @@ func (h Handler) HandleShortURLDetail(c echo.Context) error {
 		}
 		return c.JSON(http.StatusInternalServerError, message)
 	}
+
 	if (model.URLMapping{}) == result {
 		message := response.Message{
 			Message: "Short url not found",
 		}
-		return c.JSON(http.StatusInternalServerError, message)
+		return c.JSON(http.StatusNotFound, message)
 	} else {
 		detail := response.Detail{
 			OriginalURL: result.OriginalURL,
@@ -112,6 +113,6 @@ func (h Handler) HandleShortURLDetail(c echo.Context) error {
 			UsedCount:   result.Count,
 			ExpDate:     result.ExpTime.Format("2006-01-02 15:04:05"),
 		}
-		return c.JSON(http.StatusInternalServerError, detail)
+		return c.JSON(http.StatusOK, detail)
 	}
 }

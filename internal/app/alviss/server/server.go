@@ -10,17 +10,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-var (
-	ServerPort string
-)
+var Port string
 
-func RunServer(port string) {
+func Run(port string) {
 	fmt.Println("Server is running on port " + port)
 	// sleep for a while to wait for the database to be ready
 	time.Sleep(time.Second * 3)
 
 	sqlURLRepo := model.SQLURLRepo{DB: db.InitDB()}
-	h := handler.Handler{
+	h := handler.URLHandler{
 		Port:    port,
 		URLRepo: sqlURLRepo,
 	}

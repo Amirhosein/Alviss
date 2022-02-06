@@ -35,7 +35,7 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		port, _ := cmd.Flags().GetString("port")
 		fmt.Println("runserver called")
-		server.RunServer(port)
+		server.Run(port)
 	},
 }
 
