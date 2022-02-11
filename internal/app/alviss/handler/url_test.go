@@ -4,15 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+	"time"
+
 	"github.com/amirhosein/alviss/internal/app/alviss/handler"
 	"github.com/amirhosein/alviss/internal/app/alviss/model"
 	"github.com/amirhosein/alviss/internal/app/alviss/response"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/suite"
-	"net/http"
-	"net/http/httptest"
-	"testing"
-	"time"
 )
 
 var (
@@ -62,7 +63,28 @@ func (suite *URLHandlerSuite) SetupSuite() {
 	}
 
 	suite.engine = echo.New()
+	suite.engine.GET("/", suite.urlHandler.Home)
 	suite.engine.GET("/url/:shortURL", suite.urlHandler.HandleShortURLDetail)
+}
+
+func (suite *URLHandlerSuite) TestHome() {
+	expected := response.Message{
+		Message: "Welcome to Alviss! Your mythical URL shortener",
+	}
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := suite.engine.NewContext(req, rec)
+
+	suite.NoError(suite.urlHandler.Home(c))
+
+	suite.Equal(http.StatusOK, rec.Code)
+	if suite.Equal(http.StatusOK, rec.Code) {
+		var resp response.Message
+		suite.NoError(json.Unmarshal(rec.Body.Bytes(), &resp))
+
+		suite.Equal(expected, resp)
+	}
 }
 
 func (suite *URLHandlerSuite) TestHandleShortURLDetail() {
