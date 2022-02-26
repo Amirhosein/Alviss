@@ -22,24 +22,22 @@ func (h URLHandler) Home(c echo.Context) error {
 	message := response.Message{
 		Message: "Welcome to Alviss! Your mythical URL shortener",
 	}
-	return c.JSON(http.StatusInternalServerError, message)
+	return c.JSON(http.StatusOK, message)
 }
 
 func (h URLHandler) CreateShortURL(c echo.Context) error {
 	urlCreationRequest := new(request.URLCreationRequest)
 
-	if err := c.Bind(urlCreationRequest); err != nil {
-		message := response.Message{
-			Message: "Invalid request body",
-		}
-		return c.JSON(http.StatusInternalServerError, message)
+	err := c.Bind(urlCreationRequest)
+	if err != nil {
+		log.Print(err)
 	}
 
 	if err := urlCreationRequest.Validate(); err != nil {
 		message := response.Message{
 			Message: err.Error(),
 		}
-		return c.JSON(http.StatusInternalServerError, message)
+		return c.JSON(http.StatusNotAcceptable, message)
 	}
 
 	urlMapping := model.URLMapping{
@@ -50,7 +48,7 @@ func (h URLHandler) CreateShortURL(c echo.Context) error {
 
 	shortURL := util.GenerateShortLink(urlCreationRequest.LongURL)
 
-	err := h.URLRepo.Save(shortURL, urlMapping, util.GetExpireTime(urlCreationRequest.ExpDate))
+	err = h.URLRepo.Save(shortURL, urlMapping, util.GetExpireTime(urlCreationRequest.ExpDate))
 	if err != nil {
 		message := response.Message{
 			Message: err.Error(),
@@ -69,19 +67,22 @@ func (h URLHandler) HandleShortURLRedirect(c echo.Context) error {
 	shortURL := c.Param("shortURL")
 	result, err := h.URLRepo.Get(shortURL)
 	if err != nil {
-		log.Println(err)
+		message := response.Message{
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusInternalServerError, message)
 	}
 	if (model.URLMapping{}) == result {
 		message := response.Message{
 			Message: "Short url not found",
 		}
-		return c.JSON(http.StatusInternalServerError, message)
+		return c.JSON(http.StatusNotFound, message)
 	}
 	if !result.ExpTime.IsZero() && result.ExpTime.Before(time.Now()) {
 		message := response.Message{
 			Message: "Short url expired",
 		}
-		return c.JSON(http.StatusInternalServerError, message)
+		return c.JSON(http.StatusGone, message)
 	}
 	result.Count++
 	err = h.URLRepo.Update(shortURL, result)
