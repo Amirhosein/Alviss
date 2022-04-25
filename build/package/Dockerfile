@@ -1,6 +1,8 @@
 # Start from the latest golang base image
 FROM golang:alpine AS builder
 
+RUN apk add git
+
 ENV GO111MODULE=on
 
 # Set the Current Working Directory inside the container
