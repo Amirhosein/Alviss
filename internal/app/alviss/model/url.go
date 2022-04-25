@@ -49,7 +49,9 @@ func (s SQLURLRepo) Get(shortURL string) (URLMapping, error) {
 		log.Println(err)
 	}
 
-	err = s.DB.QueryRow("SELECT exp_time FROM url_mapping WHERE short_url=$1", shortURL).Scan(&urlMapping.ExpTime)
+	if s.DB.QueryRow("SELECT exp_time FROM url_mapping WHERE short_url=$1", shortURL).Scan(&urlMapping.ExpTime) != nil {
+		urlMapping.ExpTime = time.Time{}
+	}
 	return urlMapping, err
 }
 
