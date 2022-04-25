@@ -68,7 +68,7 @@ func (h URLHandler) HandleShortURLRedirect(c echo.Context) error {
 	result, err := h.URLRepo.Get(shortURL)
 	if err != nil {
 		message := response.Message{
-			Message: err.Error(),
+			Message: "Short url not found",
 		}
 		return c.JSON(http.StatusInternalServerError, message)
 	}
