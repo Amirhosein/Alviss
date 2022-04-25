@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/go-redis/redis"
 	_ "github.com/lib/pq"
 )
 
@@ -15,6 +16,13 @@ const (
 	DB_USER     = "postgres"
 	DB_PASSWORD = "postgres"
 	DB_NAME     = "alviss"
+)
+
+// initialaize the redis client
+const (
+	REDIS_HOST     = "redis"
+	REDIS_PORT     = "6379"
+	REDIS_PASSWORD = ""
 )
 
 func InitDB() *sql.DB {
@@ -53,4 +61,20 @@ func InitDB() *sql.DB {
 	fmt.Println("Successfully connected to the database")
 
 	return db
+}
+
+func InitRedis() *redis.Client {
+	client := redis.NewClient(&redis.Options{
+		Addr:     REDIS_HOST + ":" + REDIS_PORT,
+		Password: REDIS_PASSWORD,
+	})
+
+	_, err := client.Ping().Result()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Successfully connected to the redis database")
+
+	return client
 }

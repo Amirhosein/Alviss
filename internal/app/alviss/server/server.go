@@ -14,13 +14,13 @@ var Port string
 
 func Run(port string) {
 	fmt.Println("Server is running on port " + port)
-	// sleep for a while to wait for the database to be ready
 	time.Sleep(time.Second * 3)
 
 	sqlURLRepo := model.SQLURLRepo{DB: db.InitDB()}
+	cacheURLRepo := model.CacheURLRepo{URLDB: sqlURLRepo, RedisClient: db.InitRedis()}
 	h := handler.URLHandler{
 		Port:    port,
-		URLRepo: sqlURLRepo,
+		URLRepo: cacheURLRepo,
 	}
 
 	e := echo.New()

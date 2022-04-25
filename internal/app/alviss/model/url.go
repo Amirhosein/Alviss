@@ -21,7 +21,7 @@ func (s *URLMapping) UnmarshalBinary(data []byte) error {
 	return json.Unmarshal(data, s)
 }
 
-type URLRepo interface {
+type URLDB interface {
 	Save(shortURL string, urlMapping URLMapping, expTime time.Duration) error
 	Get(shortURL string) (URLMapping, error)
 	Update(shortURL string, urlMapping URLMapping) error
