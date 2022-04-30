@@ -45,6 +45,7 @@ func InitDB() *sql.DB {
 
 	// check if the table exists
 	var tableExists bool
+
 	err = db.QueryRow("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'url_mapping')").Scan(&tableExists)
 	if err != nil {
 		log.Fatal(err)

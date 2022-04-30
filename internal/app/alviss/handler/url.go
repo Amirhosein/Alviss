@@ -22,6 +22,7 @@ func (h URLHandler) Home(c echo.Context) error {
 	message := response.Message{
 		Message: "Welcome to Alviss! Your mythical URL shortener",
 	}
+
 	return c.JSON(http.StatusOK, message)
 }
 
@@ -37,6 +38,7 @@ func (h URLHandler) CreateShortURL(c echo.Context) error {
 		message := response.Message{
 			Message: err.Error(),
 		}
+
 		return c.JSON(http.StatusNotAcceptable, message)
 	}
 
@@ -53,6 +55,7 @@ func (h URLHandler) CreateShortURL(c echo.Context) error {
 		message := response.Message{
 			Message: err.Error(),
 		}
+
 		return c.JSON(http.StatusInternalServerError, message)
 	}
 
@@ -60,46 +63,58 @@ func (h URLHandler) CreateShortURL(c echo.Context) error {
 		Message:  "Short url created successfully",
 		ShortURL: "http://localhost:" + h.Port + "/" + shortURL,
 	}
+
 	return c.JSON(http.StatusOK, successfullyCreated)
 }
 
 func (h URLHandler) HandleShortURLRedirect(c echo.Context) error {
 	shortURL := c.Param("shortURL")
+
 	result, err := h.URLRepo.Get(shortURL)
 	if err != nil {
 		log.Println(err)
+
 		message := response.Message{
 			Message: "Short url not found",
 		}
+
 		return c.JSON(http.StatusInternalServerError, message)
 	}
+
 	if (model.URLMapping{}) == result {
 		message := response.Message{
 			Message: "Short url not found",
 		}
+
 		return c.JSON(http.StatusNotFound, message)
 	}
+
 	if !result.ExpTime.IsZero() && result.ExpTime.Before(time.Now()) {
 		message := response.Message{
 			Message: "Short url expired",
 		}
+
 		return c.JSON(http.StatusGone, message)
 	}
 	result.Count++
+
 	err = h.URLRepo.Update(shortURL, result)
 	if err != nil {
 		log.Println(err)
 	}
+
 	return c.Redirect(http.StatusMovedPermanently, result.OriginalURL)
 }
 
 func (h URLHandler) HandleShortURLDetail(c echo.Context) error {
 	shortURL := c.Param("shortURL")
+
 	result, err := h.URLRepo.Get(shortURL)
 	if err != nil {
 		message := response.Message{
 			Message: err.Error(),
 		}
+
 		return c.JSON(http.StatusInternalServerError, message)
 	}
 
@@ -107,6 +122,7 @@ func (h URLHandler) HandleShortURLDetail(c echo.Context) error {
 		message := response.Message{
 			Message: "Short url not found",
 		}
+
 		return c.JSON(http.StatusNotFound, message)
 	} else {
 		detail := response.Detail{

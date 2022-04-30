@@ -65,6 +65,7 @@ func (f FakeURLRepo) Save(shortURL string, urlMapping model.URLMapping, expTime 
 
 	urls[shortURL] = urlMapping
 	shortURL1 = shortURL
+
 	return nil
 }
 
@@ -98,7 +99,6 @@ func (suite *URLHandlerSuite) SetupSuite() {
 	suite.engine.POST("/shorten", suite.urlHandler.CreateShortURL)
 	suite.engine.GET("/url/:shortURL", suite.urlHandler.HandleShortURLDetail)
 	suite.engine.GET("/:shortURL", suite.urlHandler.HandleShortURLRedirect)
-
 }
 
 func (suite *URLHandlerSuite) TestHome() {
@@ -113,10 +113,11 @@ func (suite *URLHandlerSuite) TestHome() {
 	suite.NoError(suite.urlHandler.Home(c))
 
 	suite.Equal(http.StatusOK, rec.Code)
+
 	if suite.Equal(http.StatusOK, rec.Code) {
 		var resp response.Message
-		suite.NoError(json.Unmarshal(rec.Body.Bytes(), &resp))
 
+		suite.NoError(json.Unmarshal(rec.Body.Bytes(), &resp))
 		suite.Equal(expected, resp)
 	}
 }
