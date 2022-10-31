@@ -10,7 +10,7 @@ require (
 	github.com/labstack/echo/v4 v4.9.1
 	github.com/lib/pq v1.10.7
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
-	github.com/spf13/cobra v1.6.0
+	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.13.0
 	github.com/stretchr/testify v1.8.0
 )
