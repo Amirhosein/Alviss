@@ -1433,9 +1433,8 @@ github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
-github.com/itchyny/base58-go v0.2.1 h1:wtnhAVdOcW3WuHEASmGHMms4juOB8yEpj/KJxlB57+k=
-github.com/itchyny/base58-go v0.2.1/go.mod h1:BNvrKeAtWNSca1GohNbyhfff9/v0IrZjzWCAGeAvZZE=
-github.com/jessevdk/go-flags v1.5.0/go.mod h1:Fw0T6WPc1dYxT4mKEZRfG5kJhaTDP9pj1c2EWnYs/m4=
+github.com/itchyny/base58-go v0.2.2 h1:pswMT6rW2nRoELk5Mi8+xGLQPmDnlNnCwbfRCl2p7Mo=
+github.com/itchyny/base58-go v0.2.2/go.mod h1:e7aEDHyQXm42jniwyoi+MaUeUdeWp58C5H20rTe52co=
 github.com/jpillora/backoff v1.0.0/go.mod h1:J/6gKK9jxlEcS3zixgDgUAsiuZ7yrSoa/FX5e0EB2j4=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/json-iterator/go v1.1.9/go.mod h1:KdQUCv79m/52Kvf8AW2vK1V8akMuk1QjK/uOdHXbAo4=
