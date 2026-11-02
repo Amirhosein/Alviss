@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
-	github.com/go-ozzo/ozzo-validation/v4 v4.4.1
+	github.com/go-ozzo/ozzo-validation/v4 v4.5.0
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/itchyny/base58-go v0.2.3
 	github.com/labstack/echo/v4 v4.16.2
